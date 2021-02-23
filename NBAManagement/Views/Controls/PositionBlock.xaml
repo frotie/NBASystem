@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="NBAManagement.Views.Controls.PositionBlock"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:NBAManagement.Views.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Border BorderBrush="Transparent"
+                Background="LightGray"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <Border BorderBrush="Transparent"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Background="Yellow">
+                    <TextBlock Text="{Binding PositionAbbr, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                               Foreground="{StaticResource MainColor}"
+                               FontWeight="Bold"
+                               Margin="3"/>
+                </Border>
+
+                <ItemsControl ItemsSource="{Binding Players, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                              Grid.Column="1">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}"
+                                       Margin="10 5"
+                                       Foreground="{StaticResource MainColor}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

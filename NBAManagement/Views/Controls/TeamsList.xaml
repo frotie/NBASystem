@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="NBAManagement.Views.Controls.TeamsList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:NBAManagement.Views.Controls"
+             xmlns:converters="clr-namespace:NBAManagement.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="400">
+    <UserControl.Resources>
+        <converters:TeamsLogoConverter x:Key="TeamsLogoConverter"/>
+    </UserControl.Resources>
+    <Grid x:Name="Root">
+        <ItemsControl ItemsSource="{Binding Teams, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+    
+                        <!--  Current image  -->
+                        <Button Command="{Binding DataContext.LineupClick, ElementName=Root}"
+                                CommandParameter="{Binding}"
+                                Background="Transparent"
+                                BorderBrush="Transparent">
+                            <Image Source="{Binding Logo, Converter={StaticResource TeamsLogoConverter}}"
+                                   Margin="3"
+                                   MinHeight="40"
+                                   MaxHeight="60"
+                                   Cursor="Hand"
+                                   Stretch="Fill"/>
+                        </Button>
+                        
+
+                        <StackPanel Grid.Column="1">
+                            <Button Command="{Binding DataContext.LineupClick, ElementName=Root}"
+                                    CommandParameter="{Binding}"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent">
+                                <TextBlock Text="{Binding TeamName}"
+                                           Style="{StaticResource HeaderText}"/>
+                            </Button>
+                            <UniformGrid Columns="3">
+                                <Button Content="Roster" 
+                                        Command="{Binding DataContext.RosterClick, ElementName=Root}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource LinkButton}"/>
+                                <Button Content="Matchup"
+                                        Command="{Binding DataContext.MatchupClick, ElementName=Root}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource LinkButton}"/>
+                                <Button Content="First Lineup"
+                                        Command="{Binding DataContext.LineupClick, ElementName=Root}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource LinkButton}"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>
