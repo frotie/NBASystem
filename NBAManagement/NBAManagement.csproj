@@ -176,6 +176,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\PlayersLogoConverter.cs" />
     <Compile Include="Converters\TeamsLogoConverter.cs" />
     <Compile Include="Events\ChangePage.cs" />
     <Compile Include="Events\IEvent.cs" />
@@ -201,11 +202,13 @@
     <Compile Include="Models\BaseModels\Team.cs" />
     <Compile Include="Models\BasketballSystemContext.cs" />
     <Compile Include="Models\Enums\TeamDetail.cs" />
+    <Compile Include="Models\PlayerData.cs" />
     <Compile Include="Services\EventBus.cs" />
     <Compile Include="Services\MessageBus.cs" />
     <Compile Include="Services\Subscribers.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\Pages\MainPageVM.cs" />
+    <Compile Include="ViewModels\Pages\PlayersPageVM.cs" />
     <Compile Include="ViewModels\Pages\TeamDetailsVM.cs" />
     <Compile Include="ViewModels\Pages\TeamsMainVM.cs" />
     <Compile Include="ViewModels\Pages\VisitorMenuVM.cs" />
@@ -220,6 +223,9 @@
     </Compile>
     <Compile Include="Views\Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\PlayersMain.xaml.cs">
+      <DependentUpon>PlayersMain.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Pages\TeamDetails.xaml.cs">
       <DependentUpon>TeamDetails.xaml</DependentUpon>
@@ -256,6 +262,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\Pages\MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Pages\PlayersMain.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -307,6 +317,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Images\lineup.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\person.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Data.SqlClient.SNI.1.1.0\build\net46\Microsoft.Data.SqlClient.SNI.targets" Condition="Exists('..\packages\Microsoft.Data.SqlClient.SNI.1.1.0\build\net46\Microsoft.Data.SqlClient.SNI.targets')" />

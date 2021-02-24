@@ -23,5 +23,9 @@ namespace NBAManagement.ViewModels.Pages
         {
             await _eventBus.Publish(new ChangePage(new TeamsMain()));
         });
+        public ICommand GoPlayers => new RelayCommand(async o =>
+        {
+            await _eventBus.Publish(new ChangePage(new PlayersMain()));
+        });
     }
 }

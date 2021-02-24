@@ -48,13 +48,13 @@
                         <DataGrid ItemsSource="{Binding Players}" AutoGenerateColumns="False"
                                   IsReadOnly="True">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="No." Binding="{Binding ShirtNumber}" />
+                                <DataGridTextColumn Header="No." Binding="{Binding PlayerInTeam.ShirtNumber}" />
                                 <DataGridTextColumn Header="Name" Binding="{Binding Player.Name}" />
                                 <DataGridTextColumn Header="Position" Binding="{Binding Position}" />
                                 <DataGridTextColumn Header="Date of birth" Binding="{Binding Player.DateOfBirth, StringFormat=dd:MM:yyyy}" />
                                 <DataGridTextColumn Header="College" Binding="{Binding Player.College}" />
                                 <DataGridTextColumn Header="Experience" Binding="{Binding Experience}" />
-                                <DataGridTextColumn Header="Salary" Binding="{Binding Salary}"/>
+                                <DataGridTextColumn Header="Salary" Binding="{Binding PlayerInTeam.Salary}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>

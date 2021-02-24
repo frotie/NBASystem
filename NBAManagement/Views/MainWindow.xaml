@@ -49,9 +49,9 @@
                             VerticalAlignment="Center">
                     <Button Content="Back"
                             HorizontalAlignment="Right"
-                            Style="{StaticResource PrimaryButton}"
-                            Command="{Binding GoBack}"
-                            Margin="10"/>
+                            Click="GoBack_Click"
+                            Margin="10"
+                            Style="{StaticResource PrimaryButton}"/>
                 </StackPanel>
             </Grid>
         </Border>

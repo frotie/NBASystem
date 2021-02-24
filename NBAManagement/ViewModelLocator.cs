@@ -30,5 +30,7 @@ namespace NBAManagement
         public TeamsMainVM TeamsMainVM => new TeamsMainVM();
         public TeamDetailsVM TeamDetailsVM => _teamDetailsVM;
         public TeamListVM TeamListVM => new TeamListVM(_messageBus, _eventBus);
+
+        public PlayersPageVM PlayersPageVM => new PlayersPageVM();
     }
 }

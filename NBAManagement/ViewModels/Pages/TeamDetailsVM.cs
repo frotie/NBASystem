@@ -95,8 +95,7 @@ namespace NBAManagement.ViewModels.Pages
                 PlayerData pd = new PlayerData();
 
                 pd.Player = _db.Players.Local.Where(p => p.PlayerId == pit.PlayerId).FirstOrDefault();
-                pd.ShirtNumber = pit.ShirtNumber;
-                pd.Salary = pit.Salary;
+                pd.PlayerInTeam = pit;
                 pd.Position = _db.Positions.Local.Where(p => p.PositionId == pd.Player.PositionId).FirstOrDefault().Name;
                 pd.Experience = DateTime.Now.Year - Convert.ToInt32(SelectedSeason.Name.Split('-')[0]);
 
@@ -137,15 +136,6 @@ namespace NBAManagement.ViewModels.Pages
             UpdateMatchups();
             UpdateLineup();
         }
-    }
-
-    class PlayerData
-    {
-        public Player Player { get; set; }
-        public int Salary { get; set; }
-        public int Experience { get; set; }
-        public string Position { get; set; }
-        public int ShirtNumber { get; set; }
     }
 
     class MatchupData
