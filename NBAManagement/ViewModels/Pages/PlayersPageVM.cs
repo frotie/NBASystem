@@ -18,34 +18,14 @@ namespace NBAManagement.ViewModels.Pages
         public ObservableCollection<PlayerData> Players { get; set; }
 
         #region Pagination
-        public int ROWS_PER_PAGE { get; set; } = 10;
-        private int _allRecordsCount;
-        public int AllRecordsCount {
-            get => _allRecordsCount;
-            set
-            {
-                _allRecordsCount = value;
-                OnPropertyChanged();
-            }
-        }
-        private int _currentPage;
-        public int CurrentPage {
+        private int _currentPage = 1;
+        public int CurrentPage
+        {
             get => _currentPage;
             set
             {
                 _currentPage = value;
                 UpdateData();
-            }
-        }
-        private string _sortLetter;
-        public ObservableCollection<int> AllPages { get; set; }
-        private int _pagesCount;
-        public int PagesCount {
-            get => _pagesCount;
-            set
-            {
-                _pagesCount = value;
-                OnPropertyChanged();
             }
         }
         private Season _selectedSeason;
@@ -60,75 +40,95 @@ namespace NBAManagement.ViewModels.Pages
                 UpdateData();
             }
         }
+        private int _pagesCount;
+        public int PagesCount {
+            get => _pagesCount;
+            set
+            {
+                _pagesCount = value;
+                OnPropertyChanged();
+            }
+        }
+        private int _totalRecords;
+        public int TotalRecords {
+            get => _totalRecords;
+            set
+            {
+                _totalRecords = value;
+                OnPropertyChanged();
+            }
+        }
+        private uint _rowsInPage;
+        public uint RowsInPage {
+            get => _rowsInPage;
+            set
+            {
+                _rowsInPage = value;
+                OnPropertyChanged();
+            }
+        }
+        public ObservableCollection<int> AllPages { get; set; }
+        private string _sortLetter;
         #endregion
         private BasketballSystemContext _db;
+        public DbPagination<Player> Pagination { get; private set; }
         public PlayersPageVM()
         {
-            LetterButtons = new ObservableCollection<string>(Enumerable.Range('A', 'Z' - 'A' + 1).Select(c => ((char)c).ToString()).ToList());
-            LetterButtons.Insert(0, "ALL");
             _db = new BasketballSystemContext();
             _sortLetter = "";
 
-
-            _db.Seasons.Load();
-            _db.Players.Load();
-            _db.PlayersInTeams.Load();
-            _db.Countries.Load();
-            _db.Positions.Load();
-            _db.Teams.Load();
-
+            LetterButtons = new ObservableCollection<string>(Enumerable.Range('A', 'Z' - 'A' + 1).Select(c => ((char)c).ToString()).ToList());
+            LetterButtons.Insert(0, "ALL");
+            Pagination = new DbPagination<Player>(_db);
             Players = new ObservableCollection<PlayerData>();
             AllPages = new ObservableCollection<int>();
 
-            Seasons = new ObservableCollection<Season>(_db.Seasons.Local);
-            SelectedSeason = _db.Seasons.Local.FirstOrDefault();
 
-            CurrentPage = 1;
+            Seasons = new ObservableCollection<Season>(_db.Seasons);
+            SelectedSeason = _db.Seasons.FirstOrDefault();
         }
 
         private void UpdateData()
         {
-            List<Player> allPlayers = new List<Player>();
+            Pagination.SetPredicate(
+                p => _db.PlayersInTeams
+                .Where(pit => pit.PlayerId == p.PlayerId)
+                .Any()
+                && p.Name.StartsWith(_sortLetter)
+            );
 
-            foreach (PlayerInTeam pit in _db.PlayersInTeams.Local
-                .Where(p => p.SeasonId == SelectedSeason.SeasonId))
-            {
-                var pl = _db.Players.Local.Where(p => pit.PlayerId == p.PlayerId).First();
-
-                if (pl.Name.ToLower().StartsWith(_sortLetter.ToLower()))
-                    allPlayers.Add(pl);
-            }
-
-            SetAllPages(allPlayers.Count);
-            UpdateTable(allPlayers);
+            SetAllPages();
+            UpdateTable();
         }
 
-        private void SetAllPages(int records)
+        private void SetAllPages()
         {
-            AllRecordsCount = records;
-            PagesCount = (int)Math.Ceiling((double)AllRecordsCount / ROWS_PER_PAGE);
-
             AllPages.Clear();
-            for (int i = 0; i < PagesCount; i++)
+            for (int i = 0; i < Pagination.PagesCount; i++)
             {
                 AllPages.Add(i + 1);
             }
+
+            PagesCount = Pagination.PagesCount;
+            TotalRecords = Pagination.TotalRecords;
+            RowsInPage = Pagination.RowsInPage;
             OnPropertyChanged("CurrentPage");
         }
 
-        private void UpdateTable(IEnumerable<Player> players)
+        private void UpdateTable()
         {
             Players.Clear();
-            foreach (var player in players.Skip((CurrentPage - 1) * ROWS_PER_PAGE).Take(ROWS_PER_PAGE))
+
+            foreach (var player in Pagination.GetPage(CurrentPage))
             {
                 PlayerData pd = new PlayerData();
 
                 pd.Player = player;
-                pd.PlayerInTeam = _db.PlayersInTeams.Local.Where(pit => pit.PlayerId == player.PlayerId).FirstOrDefault();
+                pd.PlayerInTeam = _db.PlayersInTeams.Where(pit => pit.PlayerId == player.PlayerId).FirstOrDefault();
                 pd.Coutry = _db.Countries.Where(c => c.CountryCode == player.CountryCode).Select(c => c.CountryName).FirstOrDefault();
                 pd.Experience = DateTime.Now.Year - Convert.ToInt32(SelectedSeason.Name.Split('-')[0]);
-                pd.Position = _db.Positions.Local.Where(p => p.PositionId == pd.Player.PositionId).FirstOrDefault().Name;
-                pd.Team = _db.Teams.Local.Where(t => t.TeamId == pd.PlayerInTeam.TeamId).Select(t => t.TeamName).FirstOrDefault();
+                pd.Position = _db.Positions.Where(p => p.PositionId == pd.Player.PositionId).FirstOrDefault().Name;
+                pd.Team = _db.Teams.Where(t => t.TeamId == pd.PlayerInTeam.TeamId).Select(t => t.TeamName).FirstOrDefault();
 
                 Players.Add(pd);
             }
@@ -151,12 +151,12 @@ namespace NBAManagement.ViewModels.Pages
         public ICommand PaginationGoForward => new RelayCommand(o =>
         {
             CurrentPage = CurrentPage + 1;
-        }, o => CurrentPage < PagesCount);
+        }, o => CurrentPage < Pagination.PagesCount);
         
         public ICommand PaginationGoEnd => new RelayCommand(o =>
         {
-            CurrentPage = PagesCount;
-        }, o => CurrentPage != PagesCount);
+            CurrentPage = Pagination.PagesCount;
+        }, o => CurrentPage != Pagination.PagesCount);
 
         public ICommand ChooseLetter => new RelayCommand(letter =>
         {

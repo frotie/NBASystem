@@ -202,6 +202,7 @@
     <Compile Include="Models\BaseModels\Season.cs" />
     <Compile Include="Models\BaseModels\Team.cs" />
     <Compile Include="Models\BasketballSystemContext.cs" />
+    <Compile Include="Models\DbPagination.cs" />
     <Compile Include="Models\Enums\TeamDetail.cs" />
     <Compile Include="Models\PlayerData.cs" />
     <Compile Include="Services\EventBus.cs" />

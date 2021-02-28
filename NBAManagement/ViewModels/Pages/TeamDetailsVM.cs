@@ -63,25 +63,11 @@ namespace NBAManagement.ViewModels.Pages
                 SelectedDetail = (int)team.SelectedDetail;
 
                 // Loading and initializing data
-                _db.Divisions.Where(d => d.DivisionId == CurrentTeam.DivisionId).Load();
-                CurrentDivision = _db.Divisions.Local.FirstOrDefault();
+                CurrentDivision = _db.Divisions.Where(d => d.DivisionId == CurrentTeam.DivisionId).FirstOrDefault();
+                CurrentConference = _db.Conferences.Where(c => c.ConferenceId == CurrentDivision.ConferenceId).FirstOrDefault();
 
-                _db.Conferences.Where(c => c.ConferenceId == CurrentDivision.ConferenceId).Load();
-                CurrentConference = _db.Conferences.FirstOrDefault();
-
-                _db.Matchups.Where(m => m.TeamHomeId == CurrentTeam.TeamId || m.TeamAwayId == CurrentTeam.TeamId).Load();
-                _db.PlayersInTeams.Where(p => p.TeamId == CurrentTeam.TeamId).Load();
-
-
-                _db.Teams.Load();
-                _db.Players.Load();
-                _db.MatchupTypes.Load();
-                _db.Seasons.Load();
-                _db.Positions.Load();
-
-
-                Seasons = new ObservableCollection<Season>(_db.Seasons.Local);
-                SelectedSeason = _db.Seasons.Local.FirstOrDefault();
+                Seasons = new ObservableCollection<Season>(_db.Seasons);
+                SelectedSeason = _db.Seasons.FirstOrDefault();
 
                 UpdateData();
             });
@@ -90,13 +76,13 @@ namespace NBAManagement.ViewModels.Pages
         private void UpdatePlayers()
         {
             Players.Clear();
-            foreach (PlayerInTeam pit in _db.PlayersInTeams.Local.Where(p => p.SeasonId == SelectedSeason.SeasonId))
+            foreach (PlayerInTeam pit in _db.PlayersInTeams.Where(p => p.SeasonId == SelectedSeason.SeasonId && p.TeamId == CurrentTeam.TeamId))
             {
                 PlayerData pd = new PlayerData();
 
-                pd.Player = _db.Players.Local.Where(p => p.PlayerId == pit.PlayerId).FirstOrDefault();
+                pd.Player = _db.Players.Where(p => p.PlayerId == pit.PlayerId).FirstOrDefault();
                 pd.PlayerInTeam = pit;
-                pd.Position = _db.Positions.Local.Where(p => p.PositionId == pd.Player.PositionId).FirstOrDefault().Name;
+                pd.Position = _db.Positions.Where(p => p.PositionId == pd.Player.PositionId).FirstOrDefault().Name;
                 pd.Experience = DateTime.Now.Year - Convert.ToInt32(SelectedSeason.Name.Split('-')[0]);
 
                 Players.Add(pd);
@@ -106,12 +92,14 @@ namespace NBAManagement.ViewModels.Pages
         private void UpdateMatchups()
         {
             Matchups.Clear();
-            foreach(var matchup in _db.Matchups.Local.Where(m => m.SeasonId == SelectedSeason.SeasonId))
+            foreach(var matchup in _db.Matchups.Where(
+                m => m.SeasonId == SelectedSeason.SeasonId && 
+                (m.TeamHomeId == CurrentTeam.TeamId || m.TeamAwayId == CurrentTeam.TeamId)))
             {
                 MatchupData md = new MatchupData();
 
                 md.Matchup = matchup;
-                md.MatchupType = _db.MatchupTypes.Local.Where(mt => mt.MatchupTypeId == matchup.MatchupTypeId).FirstOrDefault();
+                md.MatchupType = _db.MatchupTypes.Where(mt => mt.MatchupTypeId == matchup.MatchupTypeId).FirstOrDefault();
                 md.Opponent = _db.Teams.Where(t => (matchup.TeamHomeId == t.TeamId || matchup.TeamAwayId == t.TeamId) && t.TeamId != CurrentTeam.TeamId).FirstOrDefault();
 
                 Matchups.Add(md);
@@ -121,7 +109,7 @@ namespace NBAManagement.ViewModels.Pages
         private void UpdateLineup()
         {
             PlayersByPosition.Clear();
-            foreach (var position in _db.Positions.Local)
+            foreach (var position in _db.Positions)
             {
                 PlayersByPosition.Add(position, new ObservableCollection<string>(Players
                     .Where(p => p.Player.PositionId == position.PositionId)

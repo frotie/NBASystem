@@ -96,7 +96,7 @@
                         Command="{Binding PaginationGoBack}"
                         Content="&lt;"/>
                 <ComboBox ItemsSource="{Binding AllPages}"
-                          SelectedItem="{Binding CurrentPage, Mode=TwoWay}"/>
+                          SelectedItem="{Binding CurrentPage, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock VerticalAlignment="Center" Margin="10 2">
                     <Run Text="of "/>
                     <Run Text="{Binding PagesCount}"/>
@@ -111,9 +111,9 @@
                         Content="->"/>
                 <TextBlock VerticalAlignment="Center">
                     <Run Text="Total "/>
-                    <Run Text="{Binding AllRecordsCount}"/>
+                    <Run Text="{Binding TotalRecords}"/>
                     <Run Text=" records, "/>
-                    <Run Text="{Binding ROWS_PER_PAGE}"/>
+                    <Run Text="{Binding RowsInPage}"/>
                     <Run Text=" records in one page"/>
                 </TextBlock>
             </WrapPanel>
