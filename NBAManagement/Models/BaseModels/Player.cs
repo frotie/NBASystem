@@ -12,8 +12,8 @@ namespace NBAManagement.Models.BaseModels
         public string Name { get; set; }
         public int PositionId { get; set; }
         public DateTime JoinYear { get; set; }
-        public int Height { get; set; }
-        public int Weight { get; set; }
+        public double Height { get; set; }
+        public double Weight { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string College { get; set; }
         public string CountryCode { get; set; }

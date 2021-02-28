@@ -17,7 +17,7 @@ namespace NBAManagement.ViewModels.Pages
         public ObservableCollection<Season> Seasons { get; set; }
         public ObservableCollection<PlayerData> Players { get; set; }
 
-        // Pagination
+        #region Pagination
         public int ROWS_PER_PAGE { get; set; } = 10;
         private int _allRecordsCount;
         public int AllRecordsCount {
@@ -34,7 +34,7 @@ namespace NBAManagement.ViewModels.Pages
             set
             {
                 _currentPage = value;
-                OnPropertyChanged();
+                UpdateData();
             }
         }
         private string _sortLetter;
@@ -60,6 +60,7 @@ namespace NBAManagement.ViewModels.Pages
                 UpdateData();
             }
         }
+        #endregion
         private BasketballSystemContext _db;
         public PlayersPageVM()
         {
@@ -82,46 +83,45 @@ namespace NBAManagement.ViewModels.Pages
             Seasons = new ObservableCollection<Season>(_db.Seasons.Local);
             SelectedSeason = _db.Seasons.Local.FirstOrDefault();
 
-            UpdateData();
+            CurrentPage = 1;
         }
 
-        public ICommand ChooseLetter => new RelayCommand(letter =>
-        {
-            if ((string)letter == "ALL")
-            {
-                _sortLetter = "";
-            }
-            else {
-                _sortLetter = letter as string;
-            }
-
-            UpdateData();
-        });
-
-        private void UpdateData(int page = 1)
+        private void UpdateData()
         {
             List<Player> allPlayers = new List<Player>();
 
-            foreach (PlayerInTeam pit in _db.PlayersInTeams.Local.Where(p => p.SeasonId == SelectedSeason.SeasonId))
+            foreach (PlayerInTeam pit in _db.PlayersInTeams.Local
+                .Where(p => p.SeasonId == SelectedSeason.SeasonId))
             {
-                if(_db.Players.Local.Where(p => pit.PlayerId == p.PlayerId && p.Name.ToLower().StartsWith(_sortLetter.ToLower())).Any())
-                    allPlayers.Add(_db.Players.Local.Where(p => pit.PlayerId == p.PlayerId && p.Name.ToLower().StartsWith(_sortLetter.ToLower())).FirstOrDefault());
+                var pl = _db.Players.Local.Where(p => pit.PlayerId == p.PlayerId).First();
+
+                if (pl.Name.ToLower().StartsWith(_sortLetter.ToLower()))
+                    allPlayers.Add(pl);
             }
 
-            AllRecordsCount = allPlayers.Count();
+            SetAllPages(allPlayers.Count);
+            UpdateTable(allPlayers);
+        }
+
+        private void SetAllPages(int records)
+        {
+            AllRecordsCount = records;
             PagesCount = (int)Math.Ceiling((double)AllRecordsCount / ROWS_PER_PAGE);
 
             AllPages.Clear();
-            for (int i = 1; i < PagesCount + 1; i++)
+            for (int i = 0; i < PagesCount; i++)
             {
-                AllPages.Add(i);
+                AllPages.Add(i + 1);
             }
+            OnPropertyChanged("CurrentPage");
+        }
 
+        private void UpdateTable(IEnumerable<Player> players)
+        {
             Players.Clear();
-            foreach (var player in allPlayers.Skip((page - 1) * ROWS_PER_PAGE).Take(ROWS_PER_PAGE))
+            foreach (var player in players.Skip((CurrentPage - 1) * ROWS_PER_PAGE).Take(ROWS_PER_PAGE))
             {
                 PlayerData pd = new PlayerData();
-
 
                 pd.Player = player;
                 pd.PlayerInTeam = _db.PlayersInTeams.Local.Where(pit => pit.PlayerId == player.PlayerId).FirstOrDefault();
@@ -132,28 +132,45 @@ namespace NBAManagement.ViewModels.Pages
 
                 Players.Add(pd);
             }
-
-            CurrentPage = page;
         }
 
+
+
+
+        #region Commands
         public ICommand PaginationGoStart => new RelayCommand(o =>
         {
-            UpdateData(1);
+            CurrentPage = 1;
         }, o => CurrentPage != 1);
 
         public ICommand PaginationGoBack => new RelayCommand(o =>
         {
-            UpdateData(CurrentPage - 1);
+            CurrentPage = CurrentPage - 1;
         }, o => CurrentPage > 1);
 
         public ICommand PaginationGoForward => new RelayCommand(o =>
         {
-            UpdateData(CurrentPage + 1);
+            CurrentPage = CurrentPage + 1;
         }, o => CurrentPage < PagesCount);
-
+        
         public ICommand PaginationGoEnd => new RelayCommand(o =>
         {
-            UpdateData(PagesCount);
+            CurrentPage = PagesCount;
         }, o => CurrentPage != PagesCount);
+
+        public ICommand ChooseLetter => new RelayCommand(letter =>
+        {
+            if ((string)letter == "ALL")
+            {
+                _sortLetter = "";
+            }
+            else
+            {
+                _sortLetter = letter as string;
+            }
+
+            CurrentPage = 1;
+        });
+        #endregion
     }
 }

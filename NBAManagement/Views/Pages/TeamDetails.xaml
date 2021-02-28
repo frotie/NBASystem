@@ -51,7 +51,7 @@
                                 <DataGridTextColumn Header="No." Binding="{Binding PlayerInTeam.ShirtNumber}" />
                                 <DataGridTextColumn Header="Name" Binding="{Binding Player.Name}" />
                                 <DataGridTextColumn Header="Position" Binding="{Binding Position}" />
-                                <DataGridTextColumn Header="Date of birth" Binding="{Binding Player.DateOfBirth, StringFormat=dd:MM:yyyy}" />
+                                <DataGridTextColumn Header="Date of birth" Binding="{Binding Player.DateOfBirth, StringFormat=yyyy/MM/dd}" />
                                 <DataGridTextColumn Header="College" Binding="{Binding Player.College}" />
                                 <DataGridTextColumn Header="Experience" Binding="{Binding Experience}" />
                                 <DataGridTextColumn Header="Salary" Binding="{Binding PlayerInTeam.Salary}"/>

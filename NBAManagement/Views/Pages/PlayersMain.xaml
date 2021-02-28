@@ -96,7 +96,7 @@
                         Command="{Binding PaginationGoBack}"
                         Content="&lt;"/>
                 <ComboBox ItemsSource="{Binding AllPages}"
-                          SelectedItem="{Binding CurrentPage}"/>
+                          SelectedItem="{Binding CurrentPage, Mode=TwoWay}"/>
                 <TextBlock VerticalAlignment="Center" Margin="10 2">
                     <Run Text="of "/>
                     <Run Text="{Binding PagesCount}"/>
