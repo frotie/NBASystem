@@ -7,7 +7,9 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace NBAManagement.ViewModels.Pages
 {
@@ -26,6 +28,18 @@ namespace NBAManagement.ViewModels.Pages
             {
                 _currentPage = value;
                 UpdateData();
+
+                Application.Current.Dispatcher.BeginInvoke(
+                    new Action(() =>
+                    {
+                        OnPropertyChanged();
+                    }),
+                    DispatcherPriority.ContextIdle,
+                    null
+                );
+
+                //и выходим
+                return;
             }
         }
         private Season _selectedSeason;
@@ -112,7 +126,6 @@ namespace NBAManagement.ViewModels.Pages
             PagesCount = Pagination.PagesCount;
             TotalRecords = Pagination.TotalRecords;
             RowsInPage = Pagination.RowsInPage;
-            OnPropertyChanged("CurrentPage");
         }
 
         private void UpdateTable()
